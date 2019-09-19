@@ -14,7 +14,9 @@ export default class ToolBar extends PureComponent {
           activeOpacity={0.9}
           onPress={this.props.onCancel}
         >
-          <Text style={toolbarStyles.button_text}>{this.props.cancelText}</Text>
+          <Text style={toolbarStyles.button_text}>
+            {this.props.cancelText || "取消"}
+          </Text>
         </TouchableOpacity>
         <View style={siblingStyles.horizontal} />
         <TouchableOpacity
@@ -23,7 +25,7 @@ export default class ToolBar extends PureComponent {
           onPress={this.props.onConfirm}
         >
           <Text style={toolbarStyles.button_text}>
-            {this.props.confirmText}
+            {this.props.confirmText || "确认"}
           </Text>
         </TouchableOpacity>
       </View>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 import { View, PanResponder, Dimensions } from "react-native";
 import { overlayStyles, siblingStyles } from "./styles";
 
@@ -7,11 +7,9 @@ const SCRREN_WIDTH = Dimensions.get("window").width;
 /**
  * 遮罩
  */
-export default class Overlay extends Component {
+export default class Overlay extends PureComponent {
   constructor(props) {
     super(props);
-
-    this.state = { pickedValues: this.props.pickedValues };
 
     // 创建响应者处理器
     this._panResponder = PanResponder.create({

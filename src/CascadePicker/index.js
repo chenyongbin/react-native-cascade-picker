@@ -47,10 +47,6 @@ export default class CascadePicker extends Component {
     }).start();
   };
 
-  onConfirm = () => {
-    this.props.onConfirm && this.props.onConfirm(this.state.pickedValues);
-  };
-
   render() {
     let { data, itemHeight = 30 } = this.props,
       { pickedValues } = this.state,
@@ -103,10 +99,13 @@ export default class CascadePicker extends Component {
         />
         <View style={mainStyles.popbox}>
           <ToolBar
-            cancelText={this.props.cancelText || "取消"}
+            cancelText={this.props.cancelText}
             onCancel={this.props.onCancel}
-            confirmText={this.props.confirmText || "确认"}
-            onConfirm={this.onConfirm}
+            confirmText={this.props.confirmText}
+            onConfirm={() =>
+              this.props.onConfirm &&
+              this.props.onConfirm(this.state.pickedValues)
+            }
           />
           <View style={mainStyles.box}>
             {pickers}
