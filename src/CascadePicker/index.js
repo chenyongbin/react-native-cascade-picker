@@ -1,18 +1,9 @@
 import React, { Component } from "react";
-import {
-  View,
-  TouchableOpacity,
-  PanResponder,
-  Animated,
-  Dimensions
-} from "react-native";
+import { View, TouchableOpacity, Animated } from "react-native";
 import ToolBar from "./ToolBar";
 import Overlay from "./Overlay";
 import Picker from "./Picker";
 import { mainStyles, siblingStyles } from "./styles";
-
-const PICKER_ITEM_HEIGHT = 30,
-  SCRREN_WIDTH = Dimensions.get("window").width;
 
 /**
  * 级联选择器
@@ -21,52 +12,24 @@ export default class CascadePicker extends Component {
   constructor(props) {
     super(props);
 
-    // 创建响应者处理器
-    this._panResponder = PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onPanResponderRelease: this.onPanResponderBegin,
-      onPanResponderRelease: this.onPanResponderEnd,
-      onPanResponderTerminate: this.onPanResponderEnd
-    });
-
-    // 初始化响应者参数
-    this._panResponderParams = {
-      pickerCount: 0,
-      pickerIndex: 0,
-      pickerWidth: 0,
-      pickers: []
-    };
-    // 初始化选择器子项高度
-    this.pickerItemHeight = PICKER_ITEM_HEIGHT;
+    this.pickerParams = [];
 
     // 初始化state
     this.state = { pickedValues: props.pickedValues };
-    for (let i = 0; i < props.level; i++) {
+    for (let i = 0; i < props.pickedValues.length; i++) {
       this.state[`top${i}`] = new Animated.Value(0);
     }
   }
 
-  /**
-   * 响应开始时
-   */
-  onPanResponderBegin = (evt, gestureState) => {
-    let { x0, dy } = gestureState,
-      { pickerWidth, pickerCount } = this._panResponderParams,
-      index = Math.floor(x0 / pickerWidth);
-    index == pickerCount && index--;
-    this._panResponderParams.pickerIndex = index;
-
-    Animated.event([null, { dy: this.state[`top${index}`] }])(null, { dy });
+  onMove = (pickerIndex, offsetY) => {
+    Animated.event([null, { offsetY: this.state[`top${pickerIndex}`] }])(null, {
+      offsetY
+    });
   };
 
-  /**
-   * 响应结束时
-   */
-  onPanResponderEnd = (evt, gestureState) => {
-    let { pickerIndex, pickers } = this._panResponderParams,
-      { pickedValues } = this.state,
-      { pickedIndex, values } = pickers[pickerIndex],
-      offsetIndex = Math.round(gestureState.dy / this.pickerItemHeight);
+  onMoveEnd = (pickerIndex, offsetIndex) => {
+    let { pickedValues } = this.state,
+      { pickedIndex, values } = this.pickerParams[pickerIndex];
 
     pickedIndex -= offsetIndex;
     if (pickedIndex < 0) {
@@ -89,35 +52,27 @@ export default class CascadePicker extends Component {
   };
 
   render() {
-    let {
-        data,
-        level,
-        cancelText = "取消",
-        onCancel,
-        confirmText = "确定",
-        pickerItemHeight = this.pickerItemHeight
-      } = this.props,
+    let { data, itemHeight = 30 } = this.props,
       { pickedValues } = this.state,
-      levelIndex = 0,
       pickers = [],
       overlay = null;
 
     // 组装Picker
-    while (levelIndex < level && levelIndex < pickedValues.length) {
-      let pickedValue = pickedValues[levelIndex],
+    for (let index = 0; index < pickedValues.length; index++) {
+      let pickedValue = pickedValues[index],
         pickedIndex = data.findIndex(d => d.value == pickedValue);
 
       pickedIndex < 0 && pickedIndex == 0;
       pickers.push(
         <Picker
-          key={levelIndex}
+          key={index}
           items={data}
-          pickedIndex={pickedIndex}
-          itemHeight={pickerItemHeight}
-          top={this.state[`top${levelIndex}`]}
+          top={this.state[`top${index}`]}
+          {...{ pickedIndex, itemHeight }}
         />
       );
-      this._panResponderParams.pickers[levelIndex] = {
+
+      this.pickerParams[index] = {
         pickedIndex,
         values: data.map(d => d.value)
       };
@@ -126,35 +81,32 @@ export default class CascadePicker extends Component {
       if (!data || data.length == 0) {
         break;
       }
-
-      levelIndex++;
     }
 
     if (pickers.length > 0) {
-      this.pickerItemHeight = pickerItemHeight;
-      // 计算选择器数量和宽度
-      this._panResponderParams.pickerCount = pickers.length;
-      this._panResponderParams.pickerWidth = SCRREN_WIDTH / pickers.length;
       // 渲染遮罩
       overlay = (
         <Overlay
-          itemHeight={pickerItemHeight}
-          panHandlers={this._panResponder.panHandlers}
+          pickerCount={pickers.length}
+          itemHeight={itemHeight}
+          onMove={this.onMove}
+          onMoveEnd={this.onMoveEnd}
         />
       );
     }
 
     return (
       <View style={mainStyles.container}>
-        <TouchableOpacity style={siblingStyles.vertical} onPress={onCancel} />
+        <TouchableOpacity
+          style={siblingStyles.vertical}
+          onPress={this.props.onCancel}
+        />
         <View style={mainStyles.popbox}>
           <ToolBar
-            {...{
-              cancelText,
-              onCancel,
-              confirmText,
-              onConfirm: this.onConfirm
-            }}
+            cancelText={this.props.cancelText || "取消"}
+            onCancel={this.props.onCancel}
+            confirmText={this.props.confirmText || "确认"}
+            onConfirm={this.onConfirm}
           />
           <View style={mainStyles.box}>
             {pickers}

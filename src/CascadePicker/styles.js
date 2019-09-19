@@ -64,7 +64,7 @@ export const toolbarStyles = StyleSheet.create({
  */
 export const overlayStyles = StyleSheet.create({
   container: ABSOLUTE_WITH_FULL_SIZE,
-  siblingY: {
+  beyond: {
     backgroundColor: "rgba(255,255,255,1)"
   },
   item: {

@@ -66,7 +66,6 @@ const App = () => {
       <CascadePicker
         data={dates}
         pickedValues={[year, month, day]}
-        level={3}
         onCancel={() => setVisible(false)}
         onConfirm={([year, month, day]) => {
           setDate({ year, month, day });

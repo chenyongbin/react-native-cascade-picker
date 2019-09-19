@@ -1,24 +1,65 @@
-import React, { PureComponent } from "react";
-import { View, PanResponder } from "react-native";
+import React, { Component } from "react";
+import { View, PanResponder, Dimensions } from "react-native";
 import { overlayStyles, siblingStyles } from "./styles";
+
+const SCRREN_WIDTH = Dimensions.get("window").width;
 
 /**
  * 遮罩
  */
-export default class Overlay extends PureComponent {
-  render() {
-    let { itemHeight, panHandlers } = this.props,
-      itemStyle = Object.assign({}, overlayStyles.item, { height: itemHeight });
+export default class Overlay extends Component {
+  constructor(props) {
+    super(props);
 
+    this.state = { pickedValues: this.props.pickedValues };
+
+    // 创建响应者处理器
+    this._panResponder = PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: this.onPanResponderBegin,
+      onPanResponderRelease: this.onPanResponderEnd,
+      onPanResponderTerminate: this.onPanResponderEnd
+    });
+
+    // 触摸的选择器的索引
+    this.pickerIndex = 0;
+  }
+
+  /**
+   * 响应开始时
+   */
+  onPanResponderBegin = (evt, { x0, dy }) => {
+    let { pickerCount, onMove } = this.props,
+      offsetIndex = Math.floor(x0 / (SCRREN_WIDTH / pickerCount));
+    offsetIndex == pickerCount && offsetIndex--;
+    this.pickerIndex = offsetIndex;
+
+    console.log(x0, offsetIndex);
+
+    onMove && onMove(this.pickerIndex, dy);
+  };
+
+  /**
+   * 响应结束时
+   */
+  onPanResponderEnd = (evt, { dy }) => {
+    let { onMoveEnd, itemHeight } = this.props,
+      offsetIndex = Math.round(dy / itemHeight);
+    onMoveEnd && onMoveEnd(this.pickerIndex, offsetIndex);
+  };
+
+  render() {
+    let { itemHeight } = this.props,
+      itemStyle = Object.assign({}, overlayStyles.item, { height: itemHeight });
     return (
-      <View style={overlayStyles.container} {...panHandlers}>
-        <View style={[siblingStyles.vertical, overlayStyles.siblingY]} />
+      <View style={overlayStyles.container} {...this._panResponder.panHandlers}>
+        <View style={[siblingStyles.vertical, overlayStyles.beyond]} />
         <View style={[overlayStyles.offset2, itemStyle]} />
         <View style={[overlayStyles.offset1, itemStyle]} />
         <View style={[overlayStyles.offset0, itemStyle]} />
         <View style={[overlayStyles.offset1, itemStyle]} />
         <View style={[overlayStyles.offset2, itemStyle]} />
-        <View style={[siblingStyles.vertical, overlayStyles.siblingY]} />
+        <View style={[siblingStyles.vertical, overlayStyles.beyond]} />
       </View>
     );
   }
