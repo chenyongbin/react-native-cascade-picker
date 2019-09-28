@@ -27,23 +27,20 @@ export default class Overlay extends PureComponent {
    * 响应开始时
    */
   onPanResponderBegin = (evt, { x0, dy }) => {
-    let { pickerCount, onMove } = this.props,
+    let { pickerCount, onSlide } = this.props,
       offsetIndex = Math.floor(x0 / (SCRREN_WIDTH / pickerCount));
     offsetIndex == pickerCount && offsetIndex--;
     this.pickerIndex = offsetIndex;
-
-    console.log(x0, offsetIndex);
-
-    onMove && onMove(this.pickerIndex, dy);
+    onSlide && onSlide(this.pickerIndex, dy);
   };
 
   /**
    * 响应结束时
    */
   onPanResponderEnd = (evt, { dy }) => {
-    let { onMoveEnd, itemHeight } = this.props,
+    let { itemHeight, onSlideEnd } = this.props,
       offsetIndex = Math.round(dy / itemHeight);
-    onMoveEnd && onMoveEnd(this.pickerIndex, offsetIndex);
+    onSlideEnd && onSlideEnd(this.pickerIndex, offsetIndex);
   };
 
   render() {

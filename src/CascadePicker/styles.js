@@ -10,6 +10,11 @@ const PICKER_ITEM_HEIGHT = 30,
   };
 
 /**
+ * 导出项目高度
+ */
+export const pickerItemHeight = PICKER_ITEM_HEIGHT;
+
+/**
  * 相邻元素样式
  */
 export const siblingStyles = StyleSheet.create({

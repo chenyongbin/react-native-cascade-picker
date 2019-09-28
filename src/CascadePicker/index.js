@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Animated } from "react-native";
 import ToolBar from "./ToolBar";
 import Overlay from "./Overlay";
 import Picker from "./Picker";
-import { mainStyles, siblingStyles } from "./styles";
+import { mainStyles, siblingStyles, pickerItemHeight } from "./styles";
 
 /**
  * 级联选择器
@@ -21,13 +21,19 @@ export default class CascadePicker extends Component {
     }
   }
 
-  onMove = (pickerIndex, offsetY) => {
-    Animated.event([null, { offsetY: this.state[`top${pickerIndex}`] }])(null, {
+  /**
+   * 滑动时回调
+   */
+  onSlide = (pickerIndex, offsetY) => {
+    Animated.event([null, { offsetY: this.getTop(pickerIndex) }])(null, {
       offsetY
     });
   };
 
-  onMoveEnd = (pickerIndex, offsetIndex) => {
+  /**
+   * 滑动结束时回调
+   */
+  onSlideEnd = (pickerIndex, offsetIndex) => {
     let { pickedValues } = this.state,
       { pickedIndex, values } = this.pickerParams[pickerIndex];
 
@@ -38,17 +44,23 @@ export default class CascadePicker extends Component {
       pickedIndex = values.length - 1;
     }
 
+    // 设置选中项
     pickedValues[pickerIndex] = values[pickedIndex];
 
     this.setState({ pickedValues });
-    Animated.timing(this.state[`top${pickerIndex}`], {
+    Animated.timing(this.getTop(pickerIndex), {
       toValue: 0,
       duration: 10
     }).start();
   };
 
+  /**
+   * 获取选择器距顶部位移
+   */
+  getTop = index => this.state[`top${index}`];
+
   render() {
-    let { data, itemHeight = 30 } = this.props,
+    let { data, itemHeight = pickerItemHeight } = this.props,
       { pickedValues } = this.state,
       pickers = [],
       overlay = null;
@@ -58,12 +70,12 @@ export default class CascadePicker extends Component {
       let pickedValue = pickedValues[index],
         pickedIndex = data.findIndex(d => d.value == pickedValue);
 
-      pickedIndex < 0 && pickedIndex == 0;
+      pickedIndex < 0 && (pickedIndex = 0);
       pickers.push(
         <Picker
           key={index}
-          items={data}
-          top={this.state[`top${index}`]}
+          items={data.concat()}
+          top={this.getTop(index)}
           {...{ pickedIndex, itemHeight }}
         />
       );
@@ -85,8 +97,8 @@ export default class CascadePicker extends Component {
         <Overlay
           pickerCount={pickers.length}
           itemHeight={itemHeight}
-          onMove={this.onMove}
-          onMoveEnd={this.onMoveEnd}
+          onSlide={this.onSlide}
+          onSlideEnd={this.onSlideEnd}
         />
       );
     }
