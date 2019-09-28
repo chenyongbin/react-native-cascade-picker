@@ -4,7 +4,7 @@ react-native 级联选择器
 
 ## demo
 
-![演示图](./images/picker.gif "演示图")
+<img height='500' src='images/picker.gif'>
 
 ## introduction  
 
