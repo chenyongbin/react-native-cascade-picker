@@ -39,7 +39,8 @@ export const mainStyles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    overflow: "hidden"
+    overflow: "hidden",
+    backgroundColor: "#fff"
   }
 });
 

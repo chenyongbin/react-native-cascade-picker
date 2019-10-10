@@ -45,15 +45,15 @@ export default class Overlay extends PureComponent {
 
   render() {
     let { itemHeight } = this.props,
-      itemStyle = Object.assign({}, overlayStyles.item, { height: itemHeight });
+      itemStyle = [overlayStyles.item, { height: itemHeight }];
     return (
       <View style={overlayStyles.container} {...this._panResponder.panHandlers}>
         <View style={[siblingStyles.vertical, overlayStyles.beyond]} />
-        <View style={[overlayStyles.offset2, itemStyle]} />
-        <View style={[overlayStyles.offset1, itemStyle]} />
-        <View style={[overlayStyles.offset0, itemStyle]} />
-        <View style={[overlayStyles.offset1, itemStyle]} />
-        <View style={[overlayStyles.offset2, itemStyle]} />
+        <View style={[overlayStyles.offset2, ...itemStyle]} />
+        <View style={[overlayStyles.offset1, ...itemStyle]} />
+        <View style={[overlayStyles.offset0, ...itemStyle]} />
+        <View style={[overlayStyles.offset1, ...itemStyle]} />
+        <View style={[overlayStyles.offset2, ...itemStyle]} />
         <View style={[siblingStyles.vertical, overlayStyles.beyond]} />
       </View>
     );
