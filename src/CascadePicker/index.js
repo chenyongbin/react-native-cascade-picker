@@ -35,7 +35,9 @@ export default class CascadePicker extends Component {
    */
   onSlideEnd = (pickerIndex, offsetIndex) => {
     let { pickedValues } = this.state,
-      { pickedIndex, values } = this.pickerParams[pickerIndex];
+      { pickedIndex, values } = this.pickerParams[pickerIndex],
+      oldPickedIndex = pickedIndex,
+      maxPickerIndex = this.pickerParams.length - 1;
 
     pickedIndex -= offsetIndex;
     if (pickedIndex < 0) {
@@ -46,6 +48,25 @@ export default class CascadePicker extends Component {
 
     // 设置选中项
     pickedValues[pickerIndex] = values[pickedIndex];
+
+    // 若选中项的索引发生变化，则检查其子项选中项是否存在，若不存在，则重置为最后一项
+    if (pickedIndex != oldPickedIndex && pickerIndex < maxPickerIndex) {
+      let pIndex = 0,
+        items = this.props.data;
+
+      while (pIndex <= maxPickerIndex) {
+        let pickedItem = items.filter(t => t.value == pickedValues[pIndex])[0];
+
+        if (pIndex > pickerIndex && !pickedItem) {
+          pickedItem = items[items.length - 1];
+        }
+
+        pickedValues[pIndex] = pickedItem.value;
+        items = pickedItem.items || [];
+
+        pIndex++;
+      }
+    }
 
     this.setState({ pickedValues });
     Animated.timing(this.getTop(pickerIndex), {
