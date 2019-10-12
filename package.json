@@ -1,18 +1,18 @@
 {
-  "name": "ReactNativeCascadePicker",
-  "version": "0.0.1",
   "private": true,
+  "name": "@chenyongbin/react-native-cascade-picker",
+  "version": "1.0.0",
+  "description": "react-native版级联选择器",
+  "main": "./src/CascadePicker",
   "scripts": {
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
     "build-ios": "react-native run-ios --simulator=\"iPhone 11 Pro Max\""
   },
-  "dependencies": {
-    "react": "16.8.6",
-    "react-native": "0.60.5"
-  },
   "devDependencies": {
+    "react": "16.8.6",
+    "react-native": "0.60.5",
     "@babel/core": "^7.6.0",
     "@babel/runtime": "^7.6.0",
     "@react-native-community/eslint-config": "^0.0.5",
